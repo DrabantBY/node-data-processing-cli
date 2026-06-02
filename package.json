@@ -1,0 +1,22 @@
+{
+  "name": "node-data-processing-cli",
+  "version": "1.0.0",
+  "description": "rsschool nodejs assignment",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "homepage": "https://github.com/DrabantBY/node-data-processing-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrabantBY/node-data-processing-cli.git"
+  },
+  "keywords": [
+    "nodejs",
+    "rsschool",
+    "assignment"
+  ],
+  "author": "DrabantBY",
+  "license": "ISC"
+}
