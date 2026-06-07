@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { csvToJson } from "./commands/index.js";
+import { csvToJson, jsonToCsv } from "./commands/index.js";
 import { navigateBack, navigateTo, showFileList } from "./navigation.js";
 import { showCurrentDir } from "./repl.js";
 
@@ -11,14 +11,17 @@ const rl = createInterface({
   output: stdout,
 });
 
-rl.on("close", () => console.log("\nThank you for using Data Processing CLI!"));
-rl.on("SIGINT", () => {
-  rl.close();
+rl.on("close", () => {
+  console.log("\nThank you for using Data Processing CLI!");
   process.exit(0);
 });
 
+rl.on("SIGINT", rl.close);
+
 process.chdir(homedir());
+
 console.log("Welcome to Data Processing CLI!");
+
 showCurrentDir();
 
 while (true) {
@@ -49,6 +52,14 @@ while (true) {
   }
 
   if (
+    positionals?.length === 1 &&
+    positionals[0] === ".exit" &&
+    Object.keys(values).length === 0
+  ) {
+    rl.close();
+  }
+
+  if (
     positionals?.length === 2 &&
     positionals[0] === "cd" &&
     Object.keys(values).length === 0
@@ -66,7 +77,15 @@ while (true) {
     await csvToJson(values.input, values.output);
   }
 
-  showCurrentDir();
+  if (
+    positionals?.length === 1 &&
+    positionals[0] === "json-to-csv" &&
+    Object.keys(values).length === 2 &&
+    values.input &&
+    values.output
+  ) {
+    await jsonToCsv(values.input, values.output);
+  }
 
-  console.log("positionals", positionals, "values", values);
+  showCurrentDir();
 }

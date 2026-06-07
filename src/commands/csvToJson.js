@@ -1,41 +1,54 @@
 import { createReadStream, createWriteStream } from "node:fs";
 import { resolve } from "node:path";
-import { cwd } from "node:process";
 import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
 export const csvToJson = async (source, target) => {
-  const rs = createReadStream(resolve(cwd(), source));
-  const ws = createWriteStream(resolve(cwd(), target));
+  const rs = createReadStream(resolve(source));
+  const ws = createWriteStream(resolve(target));
+
+  let keys = null;
+  let tail = "";
+  let isFirst = true;
+
+  const createObj = (str) =>
+    str.split(",").reduce((obj, value, index) => {
+      obj[keys[index]] = value;
+
+      return obj;
+    }, Object.create(null));
+
+  const createJson = (stream, str) => {
+    stream.push(
+      `${isFirst ? "[\n" : ",\n"}  ${JSON.stringify(createObj(str))}`,
+    );
+    isFirst = false;
+  };
 
   const transform = new Transform({
     transform(chunk, _, callback) {
-      let keys = null;
+      const lines = `${tail}${chunk}`.split(/\r?\n+/);
 
-      this.push(
-        JSON.stringify(
-          `${chunk}`
-            .split(/\r?\n+/)
-            .filter(Boolean)
-            .reduce((acc, line, index) => {
-              if (!index) {
-                keys = line.split(",");
-                return acc;
-              }
-              acc.push(
-                line.split(",").reduce((obj, value, index) => {
-                  obj[keys[index]] = value;
+      tail = lines.pop();
 
-                  return obj;
-                }, Object.create(null)),
-              );
+      for (const line of lines) {
+        if (keys && line) {
+          createJson(this, line);
+        }
 
-              return acc;
-            }, []),
-          null,
-          2,
-        ),
-      );
+        if (!keys && line) {
+          keys = line.split(",");
+        }
+      }
+      callback();
+    },
+
+    flush(callback) {
+      if (tail && keys) {
+        createJson(this, tail);
+      }
+
+      this.push(isFirst ? "[]\n" : "\n]\n");
       callback();
     },
   });

@@ -11,9 +11,10 @@ export const navigateTo = (target) => {
 };
 
 export const showFileList = async () => {
-  const dir = process.cwd();
-
-  const entries = await readdir(dir, { recursive: true, withFileTypes: true });
+  const entries = await readdir(process.cwd(), {
+    recursive: true,
+    withFileTypes: true,
+  });
 
   const table = entries
     .reduce((acc, entry) => {
