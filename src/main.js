@@ -2,7 +2,7 @@ import { homedir } from "node:os";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { csvToJson, jsonToCsv } from "./commands/index.js";
+import { count, csvToJson, jsonToCsv } from "./commands/index.js";
 import { navigateBack, navigateTo, showFileList } from "./navigation.js";
 import { showCurrentDir } from "./repl.js";
 
@@ -85,6 +85,15 @@ while (true) {
     values.output
   ) {
     await jsonToCsv(values.input, values.output);
+  }
+
+  if (
+    positionals?.length === 1 &&
+    positionals[0] === "count" &&
+    Object.keys(values).length === 1 &&
+    values.input
+  ) {
+    await count(values.input);
   }
 
   showCurrentDir();

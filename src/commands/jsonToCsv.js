@@ -4,9 +4,6 @@ import { Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 
 export const jsonToCsv = async (source, target) => {
-  const rs = createReadStream(resolve(source));
-  const ws = createWriteStream(resolve(target));
-
   let str = "";
 
   const transform = new Transform({
@@ -27,5 +24,9 @@ export const jsonToCsv = async (source, target) => {
     },
   });
 
-  await pipeline(rs, transform, ws);
+  await pipeline(
+    createReadStream(resolve(source)),
+    transform,
+    createWriteStream(resolve(target)),
+  );
 };
