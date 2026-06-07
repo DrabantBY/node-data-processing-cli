@@ -2,7 +2,13 @@ import { homedir } from "node:os";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
 import { parseArgs } from "node:util";
-import { count, csvToJson, jsonToCsv } from "./commands/index.js";
+import {
+  count,
+  csvToJson,
+  hash,
+  hashCompare,
+  jsonToCsv,
+} from "./commands/index.js";
 import { navigateBack, navigateTo, showFileList } from "./navigation.js";
 import { showCurrentDir } from "./repl.js";
 
@@ -32,6 +38,9 @@ while (true) {
     options: {
       input: { type: "string" },
       output: { type: "string" },
+      algorithm: { type: "string" },
+      save: { type: "boolean" },
+      hash: { type: "string" },
     },
   });
 
@@ -94,6 +103,19 @@ while (true) {
     values.input
   ) {
     await count(values.input);
+  }
+
+  if (positionals?.length === 1 && positionals[0] === "hash" && values.input) {
+    await hash(values.input, values.algorithm, values.save);
+  }
+
+  if (
+    positionals?.length === 1 &&
+    positionals[0] === "hash-compare" &&
+    values.input &&
+    values.hash
+  ) {
+    await hashCompare(values.input, values.hash, values.algorithm);
   }
 
   showCurrentDir();

@@ -24,7 +24,9 @@ export const count = async (source) => {
       callback();
     },
     flush(callback) {
-      if (characters && lastChar !== "\n") lines++;
+      if (characters && lastChar !== "\n") {
+        lines++;
+      }
       this.push(
         `Lines: ${lines}\nWords: ${words}\nCharacters: ${characters}\n`,
       );
