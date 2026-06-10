@@ -1,16 +1,8 @@
 import { homedir } from "node:os";
 import { stdin, stdout } from "node:process";
 import { createInterface } from "node:readline/promises";
-import { parseArgs } from "node:util";
-import {
-  count,
-  csvToJson,
-  hash,
-  hashCompare,
-  jsonToCsv,
-} from "./commands/index.js";
-import { navigateBack, navigateTo, showFileList } from "./navigation.js";
-import { showCurrentDir } from "./repl.js";
+
+import { argsParser } from "./utils/index.js";
 
 const rl = createInterface({
   input: stdin,
@@ -18,7 +10,7 @@ const rl = createInterface({
 });
 
 rl.on("close", () => {
-  console.log("\nThank you for using Data Processing CLI!");
+  console.log("\n\x1b[34mThank you for using Data Processing CLI!\x1b[0m");
   process.exit(0);
 });
 
@@ -26,97 +18,22 @@ rl.on("SIGINT", rl.close);
 
 process.chdir(homedir());
 
-console.log("Welcome to Data Processing CLI!");
-
-showCurrentDir();
+console.log("\x1b[34mWelcome to Data Processing CLI!\x1b[0m");
+console.log(`\x1b[35mYou are currently in ${process.cwd()}\x1b[0m`);
 
 while (true) {
   const line = await rl.question("> ");
-  const { positionals, values } = parseArgs({
-    args: line.trim().split(/\s+/),
-    allowPositionals: true,
-    options: {
-      input: { type: "string" },
-      output: { type: "string" },
-      algorithm: { type: "string" },
-      save: { type: "boolean" },
-      hash: { type: "string" },
-    },
-  });
 
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "up" &&
-    Object.keys(values).length === 0
-  ) {
-    navigateBack();
-  }
-
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "ls" &&
-    Object.keys(values).length === 0
-  ) {
-    await showFileList();
-  }
-
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === ".exit" &&
-    Object.keys(values).length === 0
-  ) {
+  if (line.trim() === ".exit") {
     rl.close();
   }
 
-  if (
-    positionals?.length === 2 &&
-    positionals[0] === "cd" &&
-    Object.keys(values).length === 0
-  ) {
-    navigateTo(positionals[1]);
+  try {
+    const { command, values } = argsParser(line);
+    config[command](values);
+  } catch (error) {
+    console.log(error.message);
   }
 
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "csv-to-json" &&
-    Object.keys(values).length === 2 &&
-    values.input &&
-    values.output
-  ) {
-    await csvToJson(values.input, values.output);
-  }
-
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "json-to-csv" &&
-    Object.keys(values).length === 2 &&
-    values.input &&
-    values.output
-  ) {
-    await jsonToCsv(values.input, values.output);
-  }
-
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "count" &&
-    Object.keys(values).length === 1 &&
-    values.input
-  ) {
-    await count(values.input);
-  }
-
-  if (positionals?.length === 1 && positionals[0] === "hash" && values.input) {
-    await hash(values.input, values.algorithm, values.save);
-  }
-
-  if (
-    positionals?.length === 1 &&
-    positionals[0] === "hash-compare" &&
-    values.input &&
-    values.hash
-  ) {
-    await hashCompare(values.input, values.hash, values.algorithm);
-  }
-
-  showCurrentDir();
+  console.log(`\x1b[35mYou are currently in ${process.cwd()}\x1b[0m`);
 }
