@@ -55,7 +55,7 @@ export const csvToJson = async ({ input, output }) => {
     });
 
     await pipeline(
-      createReadStream(resolve(input)),
+      createReadStream(resolve(input), { encoding: "utf8" }),
       transform,
       createWriteStream(resolve(output)),
     );

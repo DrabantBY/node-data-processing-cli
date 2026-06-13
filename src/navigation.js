@@ -2,14 +2,18 @@ import { readdir } from "node:fs/promises";
 import { sep } from "node:path";
 import { ERROR_MESSAGES } from "./const/index.js";
 
-export const up = () => {
+export const up = async () => {
   process.chdir("..");
 };
 
-export const cd = (arr) => {
+export const cd = async (arr) => {
   if (arr.length !== 1) throw new Error(ERROR_MESSAGES.INVALID);
-  const isRoot = /^[a-z]:$/i.test(arr[0]);
-  process.chdir(`${arr[0]}${isRoot ? sep : ""}`);
+  try {
+    const isRoot = /^[a-z]:$/i.test(arr[0]);
+    process.chdir(`${arr[0]}${isRoot ? sep : ""}`);
+  } catch {
+    throw new Error(ERROR_MESSAGES.FAILED);
+  }
 };
 
 export const ls = async () => {

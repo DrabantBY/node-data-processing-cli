@@ -31,7 +31,7 @@ export const count = async ({ input }) => {
         if (characters && lastChar !== "\n") {
           lines++;
         }
-        this.push(
+        process.stdout.write(
           `Lines: ${lines}\nWords: ${words}\nCharacters: ${characters}\n`,
         );
         callback();
@@ -39,12 +39,8 @@ export const count = async ({ input }) => {
     });
 
     await pipeline(
-      createReadStream(resolve(input)),
+      createReadStream(resolve(input), { encoding: "utf8" }),
       transform,
-      process.stdout,
-      {
-        end: false,
-      },
     );
   } catch {
     throw new Error(ERROR_MESSAGES.FAILED);
