@@ -1,6 +1,8 @@
 import {
   count,
   csvToJson,
+  decrypt,
+  encrypt,
   hash,
   hashCompare,
   jsonToCsv,
@@ -13,6 +15,8 @@ export const CONFIG = {
   ls,
   count,
   hash,
+  encrypt,
+  decrypt,
   "hash-compare": hashCompare,
   "csv-to-json": csvToJson,
   "json-to-csv": jsonToCsv,
