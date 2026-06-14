@@ -6,6 +6,7 @@ import {
   hash,
   hashCompare,
   jsonToCsv,
+  logStats,
 } from "./commands/index.js";
 import { cd, ls, up } from "./navigation.js";
 
@@ -17,6 +18,7 @@ export const CONFIG = {
   hash,
   encrypt,
   decrypt,
+  "log-stats": logStats,
   "hash-compare": hashCompare,
   "csv-to-json": csvToJson,
   "json-to-csv": jsonToCsv,
