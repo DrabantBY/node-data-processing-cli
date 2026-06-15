@@ -4,7 +4,6 @@ import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ERROR_MESSAGES } from "../const/index.js";
 import { addWorker, getOffset, mergeJson } from "../utils/index.js";
-// log-stats --input d:/node/node-data-processing-cli/workspace/logs.txt
 
 export const logStats = async ({ input, output }) => {
   if (!input || !output) throw new Error(ERROR_MESSAGES.INVALID);

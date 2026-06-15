@@ -8,28 +8,28 @@ export const jsonToCsv = async ({ input, output }) => {
   if (!input || !output) throw new Error(ERROR_MESSAGES.INVALID);
 
   try {
-    let str = "";
+    const chunks = [];
 
     const transform = new Transform({
       transform(chunk, _, callback) {
-        str += `${chunk}`;
+        chunks.push(chunk);
         callback();
       },
       flush(callback) {
+        const str = Buffer.concat(chunks).toString("utf8");
         this.push(
-          JSON.parse(str).reduce((acc, item, index) => {
-            if (!index) {
-              acc = Object.keys(item).join(",");
-            }
-            return `${acc}\n${Object.values(item).join(",")}`;
-          }, ""),
+          JSON.parse(str).reduce(
+            (acc, item, index) =>
+              `${index ? acc : Object.keys(item).join(",")}\n${Object.values(item).join(",")}`,
+            "",
+          ),
         );
         callback();
       },
     });
 
     await pipeline(
-      createReadStream(resolve(input), { encoding: "utf8" }),
+      createReadStream(resolve(input)),
       transform,
       createWriteStream(resolve(output)),
     );

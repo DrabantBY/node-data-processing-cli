@@ -18,15 +18,16 @@ const readLines = createInterface({
 });
 
 for await (const line of readLines) {
-  const { 1: level, 3: code, 4: time, 6: path } = line.trim().split(/\s+/);
-
-  const codeKey = `${code[0]}xx`;
-
-  json.total += 1;
-  json.levels[level] = (json.levels[level] ?? 0) + 1;
-  json.status[codeKey] = (json.status[codeKey] ?? 0) + 1;
-  json.topPaths[path] = (json.topPaths[path] ?? 0) + 1;
-  json.avgResponseTimeMs += Number(time);
+  const trimLine = line.trim();
+  if (trimLine) {
+    const { 1: level, 3: code, 4: time, 6: path } = trimLine.split(/\s+/);
+    const codeKey = `${code[0]}xx`;
+    json.total += 1;
+    json.levels[level] = (json.levels[level] ?? 0) + 1;
+    json.status[codeKey] = (json.status[codeKey] ?? 0) + 1;
+    json.topPaths[path] = (json.topPaths[path] ?? 0) + 1;
+    json.avgResponseTimeMs += Number(time);
+  }
 }
 
 parentPort.postMessage(json);
